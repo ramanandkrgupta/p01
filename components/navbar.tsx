@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { MapPin, Menu, Search, X } from "lucide-react";
+
+import { UserButton, SignInButton, useUser } from '@clerk/nextjs'
+
+import { MapPin, Menu, Search, X, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,6 +16,7 @@ import { Input } from "@/components/ui/input";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { isSignedIn } = useUser()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -23,11 +27,7 @@ export function Navbar() {
               Serve Ease
             </span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link href="/services">Services</Link>
-            <Link href="/how-it-works">How it Works</Link>
-            <Link href="/about">About</Link>
-          </nav>
+          
         </div>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
@@ -75,9 +75,24 @@ export function Navbar() {
               <MapPin className="mr-2 h-4 w-4" />
               Location
             </Button>
-            <div id="otpless" className="z-50" data-type="SIDE_CURTAIN">
+            <Link href="/checkout">
+              <Button variant="ghost" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+            </Link>
+            {/* <div id="otpless" className="z-50" data-type="SIDE_CURTAIN">
               <Button>SignIn</Button>
-</div>
+</div> */}
+
+{isSignedIn ? (
+              <UserButton afterSignOutUrl="/" />
+            ) : (
+              <SignInButton mode="modal">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                  Sign In
+                </button>
+              </SignInButton>
+            )}
             
           </nav>
         </div>

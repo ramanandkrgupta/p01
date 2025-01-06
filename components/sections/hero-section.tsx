@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 export function HeroSection() {
   return (
@@ -19,12 +20,18 @@ export function HeroSection() {
           From home cleaning to beauty services, we bring trusted professionals to your location
         </p>
         <div className="flex gap-4 justify-center">
-          <Button size="lg" className="bg-primary hover:bg-primary/90">
-            Explore Services
-          </Button>
-          <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-black">
-            Become a Partner
-          </Button>
+        <Link href="/services">
+        <Button size="lg" className="bg-primary hover:bg-primary/90">
+          Explore Services
+        </Button>
+        </Link>
+        <Link href="/partners">
+        <Button size="lg" className="bg-primary hover:bg-primary/90">
+          Become a Partners
+        </Button>
+        </Link>
+         
+         
         </div>
       </div>
     </section>

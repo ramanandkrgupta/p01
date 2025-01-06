@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Navbar } from '@/components/navbar';
 import { Toaster } from '@/components/ui/toaster';
+import { ClerkProvider } from '@clerk/nextjs';
+import { CartProvider } from "@/contexts/cart-context";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    <ClerkProvider>
     <html lang="en" suppressHydrationWarning>
       <head>
           
@@ -37,10 +40,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          {children}
+          <CartProvider>
+            {children}
+          </CartProvider>
           <Toaster />
         </ThemeProvider>
       </body>
     </html>
+    </ClerkProvider>
   );
 }

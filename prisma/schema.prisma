@@ -1,62 +1,68 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-}
-
+// This is your Prisma schema file
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  name        String?
-  orders      Order[]
-  services    Service[]
-  guestOrders GuestOrder[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model Order {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  product    String
-  quantity   Int
-  user       User     @relation(fields: [userId], references: [id])
-  location   Location @relation(fields: [locationId], references: [id])
-  locationId Int
+model User {
+  id        String     @id @default(cuid())
+  clerkId   String     @unique
+  email     String     @unique
+  name      String?
+  bookings  Booking[]
+  cart      Cart?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Service {
-  id         Int       @id @default(autoincrement())
-  name       String
-  userId     Int
-  user       User      @relation(fields: [userId], references: [id])
-  Category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId Int?
+  id          String     @id @default(cuid())
+  name        String
+  description String
+  imageUrl    String
+  category    String
+  price       Float
+  duration    Int        // Duration in minutes
+  bookings    Booking[]
+  cartItems   CartItem[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
-model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  services Service[]
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
-model GuestOrder {
-  id       Int    @id @default(autoincrement())
-  product  String
-  quantity Int
-  userId   Int
-  user     User   @relation(fields: [userId], references: [id])
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  serviceId String
+  quantity  Int      @default(1)
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  service   Service  @relation(fields: [serviceId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Location {
-  id      Int     @id @default(autoincrement())
-  address String
-  orders  Order[]
+model Booking {
+  id          String    @id @default(cuid())
+  userId      String
+  serviceId   String
+  date        DateTime
+  startTime   DateTime
+  status      String    @default("pending") // pending, confirmed, completed, cancelled
+  totalAmount Float
+  user        User      @relation(fields: [userId], references: [id])
+  service     Service   @relation(fields: [serviceId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
