@@ -95,7 +95,7 @@ export function Cart() {
           </div>
         </div>
       ))}
-
+//test
       <div className="flex justify-between items-center pt-4 border-t">
         <div>
           <p className="text-lg font-semibold">Total</p>
