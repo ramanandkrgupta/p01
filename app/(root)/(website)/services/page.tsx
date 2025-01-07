@@ -4,6 +4,7 @@ import { useCart } from '@/contexts/cart-context'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
+import { useUser } from '@clerk/nextjs'
 import { prisma } from '@/lib/prisma'
 
 const services = [
@@ -49,8 +50,21 @@ export default function ServicesPage() {
   const { items, addItem } = useCart()
   const router = useRouter()
   const { toast } = useToast()
+  const { isSignedIn, user } = useUser()
 
   const handleAddToCart = (service: typeof services[0]) => {
+    console.log('Adding to cart:', service);
+    
+    if (!isSignedIn) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to add items to cart",
+        variant: "destructive",
+      });
+      router.push('/sign-in');
+      return;
+    }
+
     addItem(service.id, {
       id: service.id,
       name: service.name,
@@ -58,6 +72,9 @@ export default function ServicesPage() {
       description: service.description,
       imageUrl: service.imageUrl,
     })
+
+    console.log('Current cart items:', items);
+
     toast({
       title: "Added to cart",
       description: `${service.name} has been added to your cart.`,
@@ -65,7 +82,27 @@ export default function ServicesPage() {
   }
 
   const handleCheckout = () => {
-    router.push('/checkout')
+    if (!isSignedIn) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to proceed to checkout",
+        variant: "destructive",
+      });
+      router.push('/sign-in');
+      return;
+    }
+
+    if (items.length === 0) {
+      toast({
+        title: "Empty Cart",
+        description: "Please add some services to your cart first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Proceeding to checkout with items:', items);
+    router.push('/checkout');
   }
 
   const totalAmount = items.reduce(
@@ -105,7 +142,7 @@ export default function ServicesPage() {
               size="lg" 
               onClick={handleCheckout}
             >
-              Proceed to Checkout
+              Proceed to Checkout ({items.length} items)
             </Button>
           </div>
         </div>
